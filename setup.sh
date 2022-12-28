@@ -9,11 +9,6 @@ MINICONDA_INSTALL_VERSION="3-py38_4.12.0"
 
 VIRTUALIZE_MINICONDA_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE}" )" &> /dev/null && pwd )
 
-if [[ -e $VIRTUALIZE_MINICONDA_DIR ]]; then
-    echo "error: virtualize-miniconda directory already exists, looks like setup.sh has already been run"
-    exit 33
-fi
-
 DOWNLOADER_LIST=( curl wget )
 DOWNLOADER=""
 
