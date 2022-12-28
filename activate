@@ -1,0 +1,80 @@
+#https://unix.stackexchange.com/a/153061
+VIRTUALIZE_SOURCED_NAME="$_"
+
+if [ "${BASH_SOURCE-}" = "$0" ]; then
+    echo "You must source this script: \$ source $0" >&2
+    exit 33
+fi
+
+if [[ $VIRTUALIZE_ROOT && ! $VIRTUALIZE_ACTIVATING ]]; then
+    echo "virtualizer is active, not activating" $VIRTUALIZE_SOURCED_NAME
+    unset VIRTUALIZE_SOURCED_NAME
+    return
+fi
+
+if [[ $VIRTUALIZE_MINICONDA_DIR ]]; then
+    echo "This shell is already virtualized for $VIRTUALIZE_MINICONDA_DIR, type 'unactivate' to undo"
+    return
+fi
+
+VIRTUALIZE_MINICONDA_DIR=$( cd -- "$( dirname -- "${VIRTUALIZE_SOURCED_NAME}" )" &> /dev/null && pwd )
+
+VIRTUALIZE_MINICONDA_ORIG_PATH="$PATH"
+export PATH="$VIRTUALIZE_MINICONDA_DIR/miniconda/bin":$PATH
+
+VIRTUALIZE_MINICONDA_ORIG_MANPATH="$MANPATH"
+if [[ ! $MANPATH ]]; then
+    MANPATH=$(manpath)
+fi
+export MANPATH="$VIRTUALIZE_MINICONDA_DIR/miniconda/share/man:$MANPATH"
+
+
+function unactivate_miniconda() {
+    conda deactivate
+    PATH="$VIRTUALIZE_MINICONDA_ORIG_PATH"
+    unset VIRTUALIZE_MINICONDA_ORIG_PATH
+    unset VIRTUALIZE_SOURCED_NAME
+    unset VIRTUALIZE_MINICONDA_INSTALL_DIR
+    unset VIRTUALIZE_MINICONDA_DIR
+    PS1="$VIRTUALIZE_MINICONDA_ORIG_PS1"
+    unset VIRTUALIZE_MINICONDA_ORIG_PS1
+    unset VIRTUALIZE_MINICONDA_ACTIVE_VERSION
+    unset VIRTUALIZE_MINICONDA_DISPLAY
+}
+
+# stop here if called on behalf of virtualize
+if [[ $VIRTUALIZE_ACTIVATING ]]; then
+    # let virtualized deal with customizing the prompt
+    return
+fi
+
+###
+### standalone mode only from here on
+###
+
+VIRTUALIZE_ROOT=$VIRTUALIZE_MINICONDA_DIR  # prevents autoactivating
+
+function unactivate() {
+    local virtualize_miniconda_dir="$VIRTUALIZE_MINICONDA_DIR"
+    unactivate_miniconda
+    unset -f unactivate_miniconda
+    PS1="$VIRTUALIZE_MINICONDA_ORIG_PS1"
+    unset VIRTUALIZE_MINICONDA_ORIG_PS1
+    unset VIRTUALIZE_MINICONDA_ACTIVE_VERSION
+    unset VIRTUALIZE_MINICONDA_DISPLAY
+    unset VIRTUALIZE_ROOT
+    unset -f unactivate
+    echo "unactivated $virtualize_miniconda_dir"
+}
+
+VIRTUALIZE_MINICONDA_ORIG_PS1="$PS1"
+VIRTUALIZE_MINICONDA_ACTIVE_VERSION=`$VIRTUALIZE_MINICONDA_DIR/miniconda/bin/conda --version | cut -d" " -f2`
+VIRTUALIZE_MINICONDA_DISPLAY="`echo $VIRTUALIZE_MINICONDA_DIR | sed \"s%^$HOME/%%" | sed 's/\//·/g'` $VIRTUALIZE_MINICONDA_ACTIVE_VERSION"
+if [[ $ZSH_VERSION ]]; then
+   PS1="[$VIRTUALIZE_MINICONDA_DISPLAY]$PS1"
+else  # for bash (and others?)
+   PS1="[$VIRTUALIZE_MINICONDA_DISPLAY]\n$PS1"
+fi
+
+echo "miniconda activated for $VIRTUALIZE_MINICONDA_DIR"
+echo "type 'unactivate' to undo"
