@@ -6,9 +6,8 @@ if [[ "${BASH_SOURCE-}" != "$0" ]]; then
 fi
 
 MINICONDA_INSTALL_VERSION="3-py38_4.12.0"
-VIRTUALIZE_ROOT=$( cd -- "$( dirname -- "${BASH_SOURCE}" )" &> /dev/null && pwd )
 
-VIRTUALIZE_MINICONDA_DIR="${VIRTUALIZE_ROOT}/virtualize-miniconda"
+VIRTUALIZE_MINICONDA_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE}" )" &> /dev/null && pwd )
 
 if [[ -e $VIRTUALIZE_MINICONDA_DIR ]]; then
     echo "error: virtualize-miniconda directory already exists, looks like setup.sh has already been run"
