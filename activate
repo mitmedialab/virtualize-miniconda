@@ -29,6 +29,9 @@ if [[ ! $MANPATH ]]; then
 fi
 export MANPATH="$VIRTUALIZE_MINICONDA_DIR/miniconda/share/man:$MANPATH"
 
+VIRTUALIZE_MINICONDA_ORIG_PS1="$PS1"
+source $VIRTUALIZE_MINICONDA_DIR/miniconda/bin/activate
+PS1="$VIRTUALIZE_MINICONDA_ORIG_PS1"
 
 function unactivate_miniconda() {
     conda deactivate
