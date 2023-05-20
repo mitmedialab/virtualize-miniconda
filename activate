@@ -1,5 +1,5 @@
 #https://unix.stackexchange.com/a/153061
-VIRTUALIZE_SOURCED_NAME="$_"
+VIRTUALIZE_SOURCED_NAME="${_:-$BASH_SOURCE}"  # must do this first because of $_ ambiguity
 
 if [ "${BASH_SOURCE-}" = "$0" ]; then
     echo "You must source this script: \$ source $0" >&2
@@ -32,7 +32,9 @@ export MANPATH="$VIRTUALIZE_MINICONDA_DIR/miniconda/share/man:$MANPATH"
 function unactivate_miniconda() {
     conda deactivate
     PATH="$VIRTUALIZE_MINICONDA_ORIG_PATH"
+    MANPATH="$VIRTUALIZE_MINICONDA_ORIG_MANPATH"
     unset VIRTUALIZE_MINICONDA_ORIG_PATH
+    unset VIRTUALIZE_MINICONDA_ORIG_MANPATH
     unset VIRTUALIZE_SOURCED_NAME
     unset VIRTUALIZE_MINICONDA_INSTALL_DIR
     unset VIRTUALIZE_MINICONDA_DIR
