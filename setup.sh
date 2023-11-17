@@ -33,10 +33,6 @@ case $OS in
         ;;
 esac
 
-echo $TARGET
-exit
-
-
 VIRTUALIZE_MINICONDA_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE}" )" &> /dev/null && pwd )
 
 DOWNLOADER_LIST=( curl wget )
