@@ -21,10 +21,10 @@ case $OS in
         TARGET="MacOSX-${ARCH}"
     ;;
     Linux)
-        TARGET="${UNAME}-${ARCH}"
+        TARGET="${OS}-${ARCH}"
     ;;
     Windows)  # not yet sure if this is correct for Windows
-        TARGET="${UNAME}-${ARCH}"
+        TARGET="${OS}-${ARCH}"
     ;;
     *)
         echo "Unknown os $OS"
